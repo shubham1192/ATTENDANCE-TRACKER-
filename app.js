@@ -730,18 +730,29 @@ let port = process.env.PORT;
 if(port==null|| port==""){
   port=3000;
 }
+process.on('unhandledRejection', (err) => {
+  console.error('UNHANDLED REJECTION:', err);
+  process.exit(1);
+});
 (async () => {
-  let uri = process.env.MONGODB_URI;
-  if (!uri) {
-    const { MongoMemoryServer } = require('mongodb-memory-server');
-    const mongoServer = await MongoMemoryServer.create();
-    uri = mongoServer.getUri() + 'TT';
-    console.log("No MONGODB_URI set, using in-memory MongoDB (data resets on restart)");
+  try {
+    let uri = process.env.MONGODB_URI;
+    if (!uri) {
+      const { MongoMemoryServer } = require('mongodb-memory-server');
+      const mongoServer = await MongoMemoryServer.create();
+      uri = mongoServer.getUri() + 'TT';
+      console.log("No MONGODB_URI set, using in-memory MongoDB (data resets on restart)");
+    }
+    console.log("Connecting to MongoDB...");
+    await mongoose.connect(uri, { serverSelectionTimeoutMS: 15000 });
+    console.log("MongoDB connected");
+    app.listen(port, function () {
+      console.log("Server UP on port " + port);
+    });
+  } catch (err) {
+    console.error('STARTUP ERROR:', err);
+    process.exit(1);
   }
-  await mongoose.connect(uri);
-  app.listen(port, function () {
-    console.log("Server UP on port " + port);
-  });
 })();
 
 // // Here we start for the second page
