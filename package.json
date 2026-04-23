@@ -17,6 +17,7 @@
     "express": "^4.17.1",
     "jsdom": "^19.0.0",
     "lodash": "^4.17.21",
+    "mongodb-memory-server": "^11.0.1",
     "mongoose": "^6.1.4",
     "node-fetch": "^3.2.0",
     "nodemon": "^2.0.15"

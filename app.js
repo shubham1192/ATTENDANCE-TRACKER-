@@ -2,8 +2,7 @@ const express = require("express");
 const bodyParse = require("body-parser");
 const mongoose = require("mongoose");
 const read = require("body-parser/lib/read");
-// mongoose.connect('mongodb+srv://admin-shubham:test123@cluster0.a5w6k.mongodb.net/todo', {useNewUrlParser: true});
-mongoose.connect("mongodb+srv://admin-shubham:test123@cluster0.a5w6k.mongodb.net/TT", { useNewUrlParser: true });
+const { MongoMemoryServer } = require('mongodb-memory-server');
 // const date = require(__dirname+"/date.js");
 const _ = require("lodash");
 const { stringify } = require("nodemon/lib/utils");
@@ -732,9 +731,13 @@ let port = process.env.PORT;
 if(port==null|| port==""){
   port=3000;
 }
-app.listen(port, function () {
-  console.log("Server UP");
-});
+(async () => {
+  const mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri() + 'TT');
+  app.listen(port, function () {
+    console.log("Server UP on port " + port);
+  });
+})();
 
 // // Here we start for the second page
 
