@@ -2,7 +2,6 @@ const express = require("express");
 const bodyParse = require("body-parser");
 const mongoose = require("mongoose");
 const read = require("body-parser/lib/read");
-const { MongoMemoryServer } = require('mongodb-memory-server');
 // const date = require(__dirname+"/date.js");
 const _ = require("lodash");
 const { stringify } = require("nodemon/lib/utils");
@@ -732,8 +731,14 @@ if(port==null|| port==""){
   port=3000;
 }
 (async () => {
-  const mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri() + 'TT');
+  let uri = process.env.MONGODB_URI;
+  if (!uri) {
+    const { MongoMemoryServer } = require('mongodb-memory-server');
+    const mongoServer = await MongoMemoryServer.create();
+    uri = mongoServer.getUri() + 'TT';
+    console.log("No MONGODB_URI set, using in-memory MongoDB (data resets on restart)");
+  }
+  await mongoose.connect(uri);
   app.listen(port, function () {
     console.log("Server UP on port " + port);
   });
